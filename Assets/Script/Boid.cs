@@ -8,19 +8,22 @@ public class Boid : MonoBehaviour {
     [Header("Physics")]
     public float mass = 1f;
     public float maxSpeed = 10f;
-    [Range(0f, 1f)]
-    public float drag = 0.05f;
 
     [Header("Behaviours")]
     public Seek seekBehaviour;
+    public OffsetPersuit persuitBehaviour;
 
     [HideInInspector]
     public Vector3 velocity, acceleration;
     #endregion
 
+    private Vector3 desiredForward;
+
     #region Mono Methods
     void Awake() {
         seekBehaviour.SetBoid(this);
+        persuitBehaviour.SetBoid(this);
+        desiredForward = transform.forward;
     }
 
     void OnDrawGizmos() {
@@ -30,6 +33,7 @@ public class Boid : MonoBehaviour {
 
     void Update() {
         seekBehaviour.Update();
+        persuitBehaviour.Update();
         UpdatePhysics();
     }
     #endregion
@@ -39,7 +43,8 @@ public class Boid : MonoBehaviour {
         velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         acceleration = Vector3.zero;
 
-        //Update Forward
+        desiredForward = Vector3.Lerp(desiredForward, velocity, 0.25f);
+        transform.forward = desiredForward;
 
         transform.position += velocity * Time.deltaTime;
     }

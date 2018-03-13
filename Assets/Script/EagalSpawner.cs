@@ -11,7 +11,7 @@ public class EagalSpawner : MonoBehaviour {
     public GameObject prefab;
     #endregion
 
-    private Transform spawnedLeader;
+    private Boid spawnedLeader;
 
     #region Mono Methods
     void OnDrawGizmos() {
@@ -48,14 +48,28 @@ public class EagalSpawner : MonoBehaviour {
         eagalTransform.forward = transform.forward;
 
         Boid eagalBoid = eagalTransform.GetComponent<Boid>();
+        if (eagalBoid == null) {
+            Debug.LogWarning("Warning: Spawning Eagal with no Boid component.");
+            return;
+        }
 
         //Set Leader if none exists
         if (spawnedLeader == null) {
-            spawnedLeader = eagalTransform;
+            spawnedLeader = eagalBoid;
             eagalBoid.seekBehaviour.enabled = true;
             eagalBoid.seekBehaviour.targetPosition = spawnPosition + (transform.forward * 1000f);
+            eagalBoid.seekBehaviour.Awake();
 
-            //Set Persuit to false
+            eagalBoid.persuitBehaviour.enabled = false;
+
+            //Set Camera Follow
+            Camera.main.GetComponent<CameraLook>().target = eagalTransform;
+        } else {
+            eagalBoid.persuitBehaviour.enabled = true;
+            eagalBoid.persuitBehaviour.leader = spawnedLeader;
+            eagalBoid.persuitBehaviour.Awake();
+
+            eagalBoid.seekBehaviour.enabled = false;
         }
     }
     #endregion
