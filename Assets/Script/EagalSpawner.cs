@@ -47,9 +47,16 @@ public class EagalSpawner : MonoBehaviour {
         eagalTransform.position = spawnPosition;
         eagalTransform.forward = transform.forward;
 
+        Boid eagalBoid = eagalTransform.GetComponent<Boid>();
+
         //Set Leader if none exists
-        if (spawnedLeader == null)
+        if (spawnedLeader == null) {
             spawnedLeader = eagalTransform;
+            eagalBoid.seekBehaviour.enabled = true;
+            eagalBoid.seekBehaviour.targetPosition = spawnPosition + (transform.forward * 1000f);
+
+            //Set Persuit to false
+        }
     }
     #endregion
 
